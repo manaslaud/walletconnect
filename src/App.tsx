@@ -2,11 +2,65 @@
 import { useState,useEffect } from "react";
 import { connectionStatusType,defaultConnectionStatus} from "./types";
 import { BrowserProvider } from "ethers";
-import { app } from "./firebase";
+import {auth,database} from './firebase'
+import {  ref, set } from "firebase/database";
+import { createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
+import Cookies from 'js-cookie';
 //connecting to coinbase, leather and metamask
 export function App() {
-  
+ 
+  const handleRegister=async()=>{
+    if(isValidPassword(password)==false || isValidEmail(email)==false){
+      window.alert("pass/ email arent valid")
+      return;
+    }
+    createUserWithEmailAndPassword(auth,email,password).then(()=>{
+      const user=auth.currentUser
+      if(user?.getIdToken)
+        Cookies.set('token',user?.getIdToken.toString())
+      const userData={
+        ...connectionData,
+        email:email,
+        last_login:Date.now()
+      }
+      set(ref(database, 'users/' + user?.uid), userData).then( () => {
+        // Success.
+        console.log("updated db successfully")
+     } ).catch( (error) => {
+       console.log(error);
+     } );
+      alert("User created")
+    }).catch((e)=>{
+      window.alert(e.code+" "+e.message)
+    })
+  }
+  const handleLogin=async()=>{
+    if(isValidPassword(password)==false || isValidEmail(email)==false){
+      window.alert("pass/ email arent valid")
+      return;
+    }
+    signInWithEmailAndPassword(auth,email,password).then(()=>{
+      const user=auth.currentUser
+      if(user?.getIdToken)
+      Cookies.set('token',user?.getIdToken.toString())
+      const userData={
+        last_login:Date.now()
+      }
+      set(ref(database, 'users/' + user?.uid), userData).then( () => {
+        // Success.
+        console.log("updated db successfully")
+     } ).catch( (error) => {
+       console.log(error);
+     } );
+
+    }).catch((e)=>{
+      window.alert(e.code+" "+e.message)
+    })
+  }
+  const [email,setEmail]=useState<string>("")
+  const [password,setPassword]=useState<string>("")
   const [connectionData,updateConnectionData]=useState<connectionStatusType>(defaultConnectionStatus);
+  
   function isValidEmail(email:string) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
@@ -116,13 +170,18 @@ export function App() {
           </button>
         </div>
           <label htmlFor="email">Email</label>
-        <input type="email" id="email" name="email"/>
+        <input className="text-black" type="email" id="email" name="email" value={email} onChange={(e)=>{
+          setEmail(e.target.value)
+        }}/>
         <label htmlFor="password">Password</label>
-        <input type="password" name="password" id="password" />
-          <button>
+        <input className="text-black" type="password" name="password" id="password" value={password} onChange={(e)=>{
+          setPassword(e.target.value)
+          
+        }}/>
+          <button onClick={handleLogin}>
             Login
           </button>
-          <button>
+          <button onClick={handleRegister}>
             Signup
           </button>
       </div>
