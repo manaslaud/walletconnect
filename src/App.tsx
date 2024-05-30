@@ -179,10 +179,15 @@ export function App() {
           
         }}/>
           <button onClick={handleLogin}>
-            Login
+            {Cookies.get('token')?'Logged in':'Login'}
           </button>
           <button onClick={handleRegister}>
-            Signup
+          {Cookies.get('token')?'':'Signup'}
+          </button>
+          <button onClick={()=>{
+            Cookies.remove('token')
+          }}>
+             {Cookies.get('token')?'Logout':''}
           </button>
       </div>
     </main>
