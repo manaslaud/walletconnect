@@ -3,7 +3,7 @@ import { useState,useEffect } from "react";
 import { connectionStatusType,defaultConnectionStatus} from "./types";
 import { BrowserProvider } from "ethers";
 import {auth,database} from './firebase'
-import {  ref, set } from "firebase/database";
+import {  ref, set, update } from "firebase/database";
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
 import Cookies from 'js-cookie';
 //connecting to coinbase, leather and metamask
@@ -46,7 +46,7 @@ export function App() {
       const userData={
         last_login:Date.now()
       }
-      set(ref(database, 'users/' + user?.uid), userData).then( () => {
+      update(ref(database, 'users/' + user?.uid), userData).then( () => {
         // Success.
         console.log("updated db successfully")
      } ).catch( (error) => {
