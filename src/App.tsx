@@ -113,7 +113,11 @@ export function App() {
             address: addr
           }
         }));
-
+        if(!provider){
+          
+            window.alert("Coinbase not found")
+           return ;
+        }
         
     
   };
@@ -128,7 +132,7 @@ export function App() {
         }
       }
     }
-  
+  console.log(provider)
     if (provider) {
       const res=await provider.request({
         method: "eth_requestAccounts",
@@ -141,9 +145,10 @@ export function App() {
           address: res[0]
         }
       }));
-     
-      
     }
+    else{
+      window.alert("Coinbase not found")
+     }
   };
   
   return (
