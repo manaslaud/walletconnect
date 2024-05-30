@@ -2,12 +2,21 @@
 import { useState,useEffect } from "react";
 import { connectionStatusType,defaultConnectionStatus} from "./types";
 import { BrowserProvider } from "ethers";
+import { app } from "./firebase";
 //connecting to coinbase, leather and metamask
 export function App() {
-  useEffect(()=>{
-    
-  })
+  
   const [connectionData,updateConnectionData]=useState<connectionStatusType>(defaultConnectionStatus);
+  function isValidEmail(email:string) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+}
+  function isValidPassword(pass:string) {
+  if(pass.length<6){
+    return false
+  }
+    return true
+  }
   const f=async()=>{
     if((window as any).LeatherProvider){
       try{
@@ -106,11 +115,16 @@ export function App() {
           Connect to coinbase
           </button>
         </div>
-          <div onClick={()=>{
-            console.log(connectionData)
-          }}>
-            Check connected wallets
-          </div>
+          <label htmlFor="email">Email</label>
+        <input type="email" id="email" name="email"/>
+        <label htmlFor="password">Password</label>
+        <input type="password" name="password" id="password" />
+          <button>
+            Login
+          </button>
+          <button>
+            Signup
+          </button>
       </div>
     </main>
   );
