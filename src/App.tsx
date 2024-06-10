@@ -1,11 +1,20 @@
 
-import { useState,useEffect } from "react";
+import { useState,useEffect,useRef } from "react";
 import { connectionStatusType,defaultConnectionStatus} from "./types";
+import sdk from '@api/blockspan';
 import { BrowserProvider } from "ethers";
 import {auth,database} from './firebase'
 import {  ref, set, update } from "firebase/database";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
 import { createUserWithEmailAndPassword,signInWithEmailAndPassword } from "firebase/auth";
 import Cookies from 'js-cookie';
+import * as THREE from "three"
+import { Texture } from "three";
+import { useLoader } from "@react-three/fiber";
+import { b64toBlob } from "./helpers";
+import { Suspense } from "react";
+
 //connecting to coinbase, leather and metamask
 export function App() {
  
@@ -60,7 +69,9 @@ export function App() {
   const [email,setEmail]=useState<string>("")
   const [password,setPassword]=useState<string>("")
   const [connectionData,updateConnectionData]=useState<connectionStatusType>(defaultConnectionStatus);
-  
+  const [nft,setNft]=useState<any[]>([]);
+  const [nftTexture,setNftTexture]=useState<Texture| Texture[]>()
+  const meshRef=useRef(null)
   function isValidEmail(email:string) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return regex.test(email);
@@ -120,8 +131,7 @@ export function App() {
         }
         
     
-  };
-  
+  }; 
   const f3 = async () => {
     let provider = (window as any).ethereum;
     if ((window as any).ethereum.providers?.length) {
@@ -150,51 +160,94 @@ export function App() {
       window.alert("Coinbase not found")
      }
   };
-  
+  const handleFetchNFT=()=>{
+    const options = {
+      method: 'GET',
+      headers: {accept: 'application/json', 'X-API-KEY': 'tMzDtiXBm20d8vTYtzCC2a1S96N6lW3Q'}
+    };
+    
+    fetch('https://api.blockspan.com/v1/nfts/owner/0xeB783b6C91Ca5d80544Ee96DC2B25D36FCFA2275?chain=eth-sepolia&include_nft_details=true&filter=all&page_size=25', options)
+      .then(response => response.json())
+      .then(response => {console.log(response)
+          setNft(response.results)
+      })
+      .catch(err => console.error(err));
+  }
+
+  useEffect(()=>{
+    if(nft.length!=0){
+      const b64image=nft[0].nft_details.metadata.image
+      var url = (b64image as string).toString()
+      let imgBlob;
+  fetch(url)
+  .then(async(res) => {imgBlob=await res.blob()})
+  const texture = new THREE.TextureLoader().load(b64image); 
+    setNftTexture(texture)
+  console.log(texture)
+    }
+  },[nft])
+
   return (
-    <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
-      <div className="py-20">
-        <div className="flex justify-center mb-20">
-          {/* <ConnectButton
-            client={client}
-            appMetadata={{
-              name: "Example app",
-              url: "https://example.com",
-            }}
-          /> */}
-          <button style={{
-            width:"100%"
-          }} onClick={f}>
-            Connect to leather(Bitcoin wallet)
-          </button>
-          <button onClick={f2}>
-          Connect to metamask
-          </button>
-          <button onClick={f3}>
-          Connect to coinbase
-          </button>
-        </div>
-          <label htmlFor="email">Email</label>
-        <input className="text-black" type="email" id="email" name="email" value={email} onChange={(e)=>{
-          setEmail(e.target.value)
-        }}/>
-        <label htmlFor="password">Password</label>
-        <input className="text-black" type="password" name="password" id="password" value={password} onChange={(e)=>{
-          setPassword(e.target.value)
+    // <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
+    //   <div className="py-20">
+    //     <div className="flex justify-center mb-20">
+    //       {/* <ConnectButton
+    //         client={client}
+    //         appMetadata={{
+    //           name: "Example app",
+    //           url: "https://example.com",
+    //         }}
+    //       /> */}
+    //       <button style={{
+    //         width:"100%"
+    //       }} onClick={f}>
+    //         Connect to leather(Bitcoin wallet)
+    //       </button>
+    //       <button onClick={f2}>
+    //       Connect to metamask
+    //       </button>
+    //       <button onClick={f3}>
+    //       Connect to coinbase
+    //       </button>
+    //     </div>
+    //       <label htmlFor="email">Email</label>
+    //     <input className="text-black" type="email" id="email" name="email" value={email} onChange={(e)=>{
+    //       setEmail(e.target.value)
+    //     }}/>
+    //     <label htmlFor="password">Password</label>
+    //     <input className="text-black" type="password" name="password" id="password" value={password} onChange={(e)=>{
+    //       setPassword(e.target.value)
           
-        }}/>
-          <button onClick={handleLogin}>
-            {Cookies.get('token')?'Logged in':'Login'}
-          </button>
-          <button onClick={handleRegister}>
-          {Cookies.get('token')?'':'Signup'}
-          </button>
-          <button onClick={()=>{
-            Cookies.remove('token')
-          }}>
-             {Cookies.get('token')?'Logout':''}
-          </button>
-      </div>
+    //     }}/>
+    //       <button onClick={handleLogin}>
+    //         {Cookies.get('token')?'Logged in':'Login'}
+    //       </button>
+    //       <button onClick={handleRegister}>
+    //       {Cookies.get('token')?'':'Signup'}
+    //       </button>
+    //       <button onClick={()=>{
+    //         Cookies.remove('token')
+    //       }}>
+    //          {Cookies.get('token')?'Logout':''}
+    //       </button>
+    //   </div>
+    // </main>
+    <main className="h-screen">
+      {/*using metamask account */}
+      <button onClick={handleFetchNFT}>Get NFT's</button>
+      <Canvas>
+    <OrbitControls/>
+  <ambientLight intensity={1} />
+  {/* <directionalLight color="red" position={[0, 10, 0]} /> */}
+  <Suspense fallback={null}>
+  <mesh ref={meshRef}>
+    <boxGeometry />
+{nftTexture?(    <meshBasicMaterial attach="material" map={nftTexture as Texture} />
+):    <meshStandardMaterial />}
+  </mesh>
+  </Suspense>
+  
+</Canvas>
     </main>
   );
 }

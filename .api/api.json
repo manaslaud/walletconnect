@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "apis": [
+    {
+      "identifier": "blockspan",
+      "source": "@blockspan/v1.0#3qijlvlw85ibe4",
+      "integrity": "sha512-CqE9FGT/TNqn8n1ph2JLkQ6EXbUTpIM42BuQUaFufXcneBbaIdf3FUOc7b1/ocRkqt+hIq14e2F7Cokc+Wicmw==",
+      "installerVersion": "6.1.1"
+    }
+  ]
+}
