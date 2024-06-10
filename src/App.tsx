@@ -66,11 +66,24 @@ export function App() {
       window.alert(e.code+" "+e.message)
     })
   }
+  const buttonStyle = {
+    padding: '10px 20px',
+    margin: '10px',
+    backgroundColor: '#007BFF',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    transition: 'background-color 0.3s ease'
+};
   const [email,setEmail]=useState<string>("")
   const [password,setPassword]=useState<string>("")
   const [connectionData,updateConnectionData]=useState<connectionStatusType>(defaultConnectionStatus);
   const [nft,setNft]=useState<any[]>([]);
   const [nftTexture,setNftTexture]=useState<Texture| Texture[]>()
+  const [phantomKey,setPhantomKey]=useState<string>('')
   const meshRef=useRef(null)
   function isValidEmail(email:string) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -186,7 +199,40 @@ export function App() {
   console.log(texture)
     }
   },[nft])
-
+  const phatomHandler=async()=>{
+    const getProvider = () => {
+      if ('phantom' in window) {
+        const provider = (window.phantom as any)?.solana;
+    
+        if (provider?.isPhantom) {
+          return provider;
+        }
+      }
+      window.open('https://phantom.app/', '_blank');
+      return null
+    };
+    const provider=getProvider()
+    if(provider)
+     {
+      try {
+        
+        const resp = await provider.connect();
+        console.log(resp.publicKey.toString());
+        setPhantomKey(resp.publicKey.toString())
+        const options = {
+          method: 'GET',
+          headers: {accept: 'application/json', 'x-api-key': '87518e00561c476b9d8914360fb2b912'}
+        };
+        
+        fetch('https://api.opensea.io/api/v2/chain/solana/account/MX62cCUcUPhpiCREGPtv3iCoCt2fTPSQgiNhRayvgdv/nfts', options)
+          .then(response => response.json())
+          .then(response => console.log(response))
+          .catch(err => console.error(err));
+    } catch (err) {
+      console.log(err)
+    }
+     }
+  }
   return (
     // <main className="p-4 pb-10 min-h-[100vh] flex items-center justify-center container max-w-screen-lg mx-auto">
     //   <div className="py-20">
@@ -234,7 +280,9 @@ export function App() {
     // </main>
     <main className="h-screen">
       {/*using metamask account */}
-      <button onClick={handleFetchNFT}>Get NFT's</button>
+      <button style={buttonStyle} onClick={handleFetchNFT}>Get NFT's OF METAMASK ACCOUNT</button>
+      <button style={buttonStyle} onClick={phatomHandler}>{phantomKey?`Phantom acc key ${phantomKey}`:'Connect and obtain Phantom NFT\'s'}</button>
+
       <Canvas>
     <OrbitControls/>
   <ambientLight intensity={1} />
