@@ -30,7 +30,3 @@ yarn build
 yarn preview
 ```
 - [thirdweb Dashboard](https://thirdweb.com/dashboard)
-
-## Join our Discord!
-
-For any questions or suggestions, join our discord at [https://discord.gg/thirdweb](https://discord.gg/thirdweb).
