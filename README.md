@@ -1,5 +1,8 @@
 
-## Setup client id
+## How it works
+```base
+the camera can be controlled using mouse controls for panning and zooming. UPon fetching nft's, the nft would be displayed on the cube.
+```
 
 ## Usage
 
