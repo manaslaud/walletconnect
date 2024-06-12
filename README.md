@@ -1,16 +1,5 @@
-# thirdweb SDK + Vite starter
 
 ## Setup client id
-
-Before you start, you need to replace the placeholder `clientId` with your client ID to use thirdweb SDK.
-
-Refer to [Creating a client](https://portal.thirdweb.com/typescript/v5/client) guide to see how you can get a client id.
-
-Go to `src/client.ts` file and replace the placeholder `clientId` with your client ID.
-
-```ts
-const clientId = "......";
-```
 
 ## Usage
 
@@ -18,11 +7,14 @@ const clientId = "......";
 
 ```bash
 yarn
+or
+npm i 
 ```
 
 ### Start development server
 
 ```bash
+or npm run dev
 yarn dev
 ```
 
@@ -37,11 +29,6 @@ yarn build
 ```bash
 yarn preview
 ```
-
-## Resources
-
-- [thirdweb SDK documentation](https://portal.thirdweb.com/typescript/v5)
-- [React components and hooks](https://portal.thirdweb.com/typescript/v5/react)
 - [thirdweb Dashboard](https://thirdweb.com/dashboard)
 
 ## Join our Discord!
