@@ -1,7 +1,7 @@
 
 import { useState,useEffect,useRef } from "react";
 import { connectionStatusType,defaultConnectionStatus} from "./types";
-import sdk from '@api/blockspan';
+import { Html } from "@react-three/drei";
 import { BrowserProvider } from "ethers";
 import {auth,database} from './firebase'
 import {  ref, set, update } from "firebase/database";
@@ -11,8 +11,6 @@ import { createUserWithEmailAndPassword,signInWithEmailAndPassword } from "fireb
 import Cookies from 'js-cookie';
 import * as THREE from "three"
 import { Texture } from "three";
-import { useLoader } from "@react-three/fiber";
-import { b64toBlob } from "./helpers";
 import { Suspense } from "react";
 
 //connecting to coinbase, leather and metamask
@@ -83,6 +81,7 @@ export function App() {
   const [nft,setNft]=useState<any[]>([]);
   const [nftTexture,setNftTexture]=useState<Texture| Texture[]>()
   const [phantomKey,setPhantomKey]=useState<string>('')
+  const [tokenName,setTokenName]=useState<string>('')
   const meshRef=useRef(null)
   function isValidEmail(email:string) {
     const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -181,6 +180,7 @@ export function App() {
     fetch('https://api.blockspan.com/v1/nfts/owner/0xeB783b6C91Ca5d80544Ee96DC2B25D36FCFA2275?chain=eth-sepolia&include_nft_details=true&filter=all&page_size=25', options)
       .then(response => response.json())
       .then(response => {console.log(response)
+        setTokenName(response.results[0].nft_details.token_name)
           setNft(response.results)
       })
       .catch(err => console.error(err));
@@ -297,6 +297,12 @@ export function App() {
 {nftTexture?(    <meshBasicMaterial attach="material" map={nftTexture as Texture} />
 ):    <meshStandardMaterial />}
   </mesh>
+  <Html position={[-1.5,-1,0]}>
+  {nftTexture?<div className="whitespace-nowrap w-full">
+    Name: {tokenName}
+  </div>:''}
+  </Html>
+  
   </Suspense>
   
 </Canvas>
