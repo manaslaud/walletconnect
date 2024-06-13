@@ -17,7 +17,6 @@ import { Suspense } from "react";
 
 //connecting to coinbase, leather and metamask
 export function App() {
- 
   const handleRegister=async()=>{
     if(isValidPassword(password)==false || isValidEmail(email)==false){
       window.alert("pass/ email arent valid")
@@ -188,7 +187,10 @@ export function App() {
   }
 
   useEffect(()=>{
-    if(nft.length!=0){
+    //checking for total nfts
+    console.log(nft)
+    if(nft.length!=0){4
+      //creating a custom texture for the cube using svg's
       const b64image=nft[0].nft_details.metadata.image
       var url = (b64image as string).toString()
       let imgBlob;
@@ -199,7 +201,9 @@ export function App() {
   console.log(texture)
     }
   },[nft])
+  //awaiting phatom wallet connection
   const phatomHandler=async()=>{
+    //getting browser injected provider
     const getProvider = () => {
       if ('phantom' in window) {
         const provider = (window.phantom as any)?.solana;
@@ -214,8 +218,7 @@ export function App() {
     const provider=getProvider()
     if(provider)
      {
-      try {
-        
+      try {        
         const resp = await provider.connect();
         console.log(resp.publicKey.toString());
         setPhantomKey(resp.publicKey.toString())
@@ -223,13 +226,14 @@ export function App() {
           method: 'GET',
           headers: {accept: 'application/json', 'x-api-key': '87518e00561c476b9d8914360fb2b912'}
         };
-        
-        fetch('https://api.opensea.io/api/v2/chain/solana/account/MX62cCUcUPhpiCREGPtv3iCoCt2fTPSQgiNhRayvgdv/nfts', options)
+        //fetching all nfts by connected solana acc
+        fetch(`https://api.opensea.io/api/v2/chain/solana/account/${resp.publicKey.toString()}/nfts`, options)
           .then(response => response.json())
           .then(response => console.log(response))
           .catch(err => console.error(err));
     } catch (err) {
       console.log(err)
+
     }
      }
   }
@@ -282,7 +286,7 @@ export function App() {
       {/*using metamask account */}
       <button style={buttonStyle} onClick={handleFetchNFT}>Get NFT's OF METAMASK ACCOUNT</button>
       <button style={buttonStyle} onClick={phatomHandler}>{phantomKey?`Phantom acc key ${phantomKey}`:'Connect and obtain Phantom NFT\'s'}</button>
-
+{/* 3d enviroment */}
       <Canvas>
     <OrbitControls/>
   <ambientLight intensity={1} />
